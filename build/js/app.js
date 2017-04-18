@@ -1,1 +1,81 @@
-!function n(o,r,t){function i(e,p){if(!r[e]){if(!o[e]){var f="function"==typeof require&&require;if(!p&&f)return f(e,!0);if(u)return u(e,!0);var a=new Error("Cannot find module '"+e+"'");throw a.code="MODULE_NOT_FOUND",a}var c=r[e]={exports:{}};o[e][0].call(c.exports,function(n){var r=o[e][1][n];return i(r||n)},c,c.exports,n,o,r,t)}return r[e].exports}for(var u="function"==typeof require&&require,e=0;e<t.length;e++)i(t[e]);return i}({1:[function(n,o,r){var t=n("./../js/pingpong.js").calculatorModule;$(document).ready(function(){$("#ping-pong-form").submit(function(n){n.preventDefault();var o=$("#goal").val();new t("hot pink").pingPong(o).forEach(function(n){$("#solution").append("<li>"+n+"</li>")})})})},{"./../js/pingpong.js":2}],2:[function(n,o,r){function t(n){this.skin=n}t.prototype.pingPong=function(n){for(var o=[],r=1;r<=n;r++)r%15==0?o.push("ping-pong"):r%3==0?o.push("ping"):r%5==0?o.push("pong"):o.push(r);return o},r.calculatorModule=t},{}]},{},[1]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+exports.apiKey = "c61623e8d3e9604512729333275885d3";
+
+},{}],2:[function(require,module,exports){
+function Calculator(skinName) {
+  this.skin = skinName;
+}
+
+Calculator.prototype.pingPong = function(goal) {
+  var output = [];
+  for (var i = 1; i <= goal; i++) {
+    if (i % 15 === 0) {
+      output.push("ping-pong");
+    } else if (i % 3 === 0) {
+      output.push("ping");
+    } else if (i % 5 === 0) {
+      output.push("pong");
+    } else  {
+      output.push(i);
+    }
+  }
+  return output;
+};
+
+exports.calculatorModule = Calculator;
+
+},{}],3:[function(require,module,exports){
+var apiKey = require('./../.env').apiKey;
+
+Weather = function(){
+}
+
+Weather.prototype.getWeather = function(city, displayHumidity) {
+  $.get('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + apiKey).then(function(response) {
+    displayHumidity(city, response.main.humidity);
+  }).fail(function(error) {
+    $('.showWeather').text(error.responseJSON.message);
+  });
+}
+
+exports.weatherModule = Weather;
+
+},{"./../.env":1}],4:[function(require,module,exports){
+var Calculator = require('./../js/pingpong.js').calculatorModule;
+
+$(document).ready(function() {
+  $('#ping-pong-form').submit(function(event) {
+    event.preventDefault();
+    var goal = $('#goal').val();
+    var simpleCalculator = new Calculator("hot pink");
+    var output = simpleCalculator.pingPong(goal);
+    output.forEach(function(element) {
+      $('#solution').append("<li>" + element + "</li>");
+    });
+  });
+});
+
+$(document).ready(function(){
+  $('#signup').submit(function(event){
+    event.preventDefault();
+    var email = $('#email').val();
+    $('#signup').hide();
+    $('#solution').prepend('<p>Thank you, ' + email + ' has been added to our list!</p>');
+  });
+});
+
+var Weather = require('./../js/weather.js').weatherModule;
+
+var displayHumidity = function(city, humidityData){
+  $('.showWeather').text("The humidity in " + city + " is " + humidityData + "%");
+}
+$(document).ready(function() {
+  var currentWeatherObject = new Weather();
+  $('#weather-location').click(function() {
+    var city = $('#location').val();
+    $('#location').val("");
+    currentWeatherObject.getWeather(city, displayHumidity);
+     });
+  });
+
+},{"./../js/pingpong.js":2,"./../js/weather.js":3}]},{},[4]);
